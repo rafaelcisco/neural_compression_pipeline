@@ -1,3 +1,4 @@
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import base64
 import os

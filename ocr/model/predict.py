@@ -18,7 +18,7 @@ import torch.nn.functional as F
 from PIL import Image, ImageOps
 from torchvision import transforms
 
-from cnn import OCRCNN
+from ocr.model.cnn import OCRCNN
 
 MNIST_MEAN = 0.1307
 MNIST_STD  = 0.3081

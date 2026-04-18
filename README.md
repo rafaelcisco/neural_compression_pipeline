@@ -5,6 +5,6 @@ pip install stuff
 - asd
 - fsd
 
-Run the app.py file
+Run the app.py file to run API
 
-In new terminal, run python test_pipeline.py <image file path>
+In new terminal, type python test_pipeline.py <image file path>

@@ -1,8 +1,11 @@
+import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
 from compression.huffman.encoder import compress
 from compression.huffman.decoder import decompress
+
+logger = logging.getLogger(__name__)
 
 # Creates the FastAPI application instance.
 app = FastAPI()
@@ -21,6 +24,7 @@ class DecompressRequest(BaseModel):
 # Returns a simple status response to confirm the service is running.
 @app.get("/health")
 async def health():
+    logger.info("Health check requested")
     return {"status": "ok"}
 
 
@@ -28,7 +32,15 @@ async def health():
 @app.post("/compress")
 async def compress_endpoint(request: CompressRequest):
     try:
+        logger.info("Compression request received")
+        logger.info("Original text length: %d characters", len(request.text))
+
         result = compress(request.text)
+
+        logger.info("Compression completed successfully")
+        logger.info("Original bits: %d", result["original_bits"])
+        logger.info("Compressed bits: %d", result["compressed_bits"])
+        logger.info("Compression ratio: %.4f", result["compression_ratio"])
 
         return {
             "encoded_data": result["compressed_data"],
@@ -42,6 +54,7 @@ async def compress_endpoint(request: CompressRequest):
 
     # Returns a server error if compression fails unexpectedly.
     except Exception as e:
+        logger.exception("Compression failed")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -49,7 +62,13 @@ async def compress_endpoint(request: CompressRequest):
 @app.post("/decompress")
 async def decompress_endpoint(request: DecompressRequest):
     try:
+        logger.info("Decompression request received")
+        logger.info("Encoded data length: %d bits", len(request.encoded_data))
+
         decoded_text = decompress(request.encoded_data)
+
+        logger.info("Decompression completed successfully")
+        logger.info("Decoded text length: %d characters", len(decoded_text))
 
         return {
             "decoded_text": decoded_text
@@ -57,7 +76,9 @@ async def decompress_endpoint(request: DecompressRequest):
 
     # Returns a bad request error if the encoded input is invalid.
     except ValueError as e:
+        logger.warning("Invalid encoded input provided for decompression")
         raise HTTPException(status_code=400, detail=str(e))
     # Returns a server error for any other unexpected failure.
     except Exception as e:
+        logger.exception("Decompression failed")
         raise HTTPException(status_code=500, detail=str(e))

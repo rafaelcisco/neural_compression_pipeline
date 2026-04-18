@@ -1,1 +1,22 @@
-# Needs to launch both the OCR and the Huffman
+services:
+  huffman_service:
+    build:
+      context: .
+      dockerfile: compression/service/Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      PYTHONPATH: /app
+
+  ocr_service:
+    build:
+      context: .
+      dockerfile: ocr/service/Dockerfile
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/app
+    environment:
+      PYTHONPATH: /app
